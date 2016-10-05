@@ -4,17 +4,33 @@ from sklearn.cluster import KMeans
 from nltk.corpus import wordnet
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk import word_tokenize
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import RegexpTokenizer
-
+import pickle
 
 # Read 1 file in train data
-def read_data(filename):
-    tree = ET.parse('training_data/nouns/access.n.xml')
+def read_train_data(word, pos):
+    folder = None
+    if pos == 'n':
+        folder = 'nouns/'
+    elif pos == 'v':
+        folder = 'verbs/'
+    path = 'training_data/' + folder+ word +'.'+ pos + '.xml'
+    tree = ET.parse(path)
     root = tree.getroot()
-    documents = list(elem.text for elem in root.getchildren())
+    documents = list(elem.text for elem in list(root))
     return documents
 
+# Read 1 file in test data
+def read_test_data(filename):
+    tree = ET.parse('test_data/nouns/access.n.xml')
+    root = tree.getroot()
+    test_documents = []
+    for i in xrange(len(root.getchildren())):
+        if root.getchildren()[i].text and root.getchildren()[i][0].text:
+            s = root.getchildren()[i].text + root.getchildren()[i][0].text
+            test_documents.append(s)
+        else:
+            s = root.getchildren()[i][0].text
+    return test_documents
 
 # Get number of meanings of a word (helper)
 def get_num_meanings(word, POS):
@@ -36,21 +52,26 @@ def get_def(word, POS):
 
 # Tfidf Vectorizer documents
 def vectorize(documents):
-    # lemmatizer = WordNetLemmatizer()
-    # tokenizer = RegexpTokenizer(r'\w+')
-
     vectorizer = TfidfVectorizer(stop_words='english').fit(documents)
+    return vectorizer
+
+# Transform vectorizer
+def transform(vectorizer, documents):
     vectors = vectorizer.transform(documents)
     return vectors
 
-# Fit KMeans model
+# Fit KMeans model, return both km model and number of clusters
 def kmean_fit(word, pos, vectors):
     km = KMeans(n_clusters = get_num_meanings(word, pos))
     km.fit(vectors)
-    return km
+    return km, get_num_meanings(word, pos)
 
 # Get labels
-def get_labels(km):
+def predict_labels(km):
+    return km.labels_
+
+# Get the list of definitions by order of labels range(0-n_cluster)
+def labels_to_defs(km):
     defs = []
     count = np.bincount(km.labels_)
     index =np.argsort(count)[::-1]
@@ -60,8 +81,6 @@ def get_labels(km):
 
 # Predict a word in a new setences
 # def predict(km, test_str, word):
-#
-#
 #     if word in test_str:
 #         v = vectorize([test_str])
 #         return km.predict(v)
@@ -70,10 +89,37 @@ def get_labels(km):
 
 
 if __name__ == '__main__':
-    documents = read_data('training_data/nouns/access.n.xml')
-    print get_def('lie', 'v')
-    # vectors = vectorize(documents)
-    # km = kmean_fit('access','n',vectors)
+    train_documents = read_train_data('bow','v')
+
+    # test_documents = read_test_data('test_data/nouns/access.n.xml')
+    # vectorizer = vectorize(train_documents)
+    # vectors = transform(vectorizer, train_documents)
+    # km, num_clusters = kmean_fit('access','n',vectors)
+
+
+    # Save model and vectorizer as pickle
+    # with open('my_model.pkl', 'wb') as f:
+    #     pickle.dump(km, f)
+    #
+    # with open('my_vectorizer.pkl', 'wb') as f:
+    #     pickle.dump(vectorizer, f)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # Prediction (need clean up and create new predict function)
     # test = 'pricing behavior could be used to determine when to remove incumbent LEC access services from price cap regulation'
