@@ -71,12 +71,12 @@ def predict_labels(km):
     return km.labels_
 
 # Get the list of definitions by order of labels range(0-n_cluster)
-def labels_to_defs(km):
+def labels_to_defs(km, word, pos):
     defs = []
     count = np.bincount(km.labels_)
     index =np.argsort(count)[::-1]
     for i in index:
-         defs.append(get_def('access','n')[i])
+         defs.append(get_def(word, pos)[i])
     return defs
 
 # Predict a word in a new setences
