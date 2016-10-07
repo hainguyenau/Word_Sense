@@ -4,6 +4,8 @@ from sklearn.cluster import AgglomerativeClustering
 from nltk.corpus import wordnet
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk import word_tokenize
+# from nltk.stem.porter import PorterStemmer
+# from nltk.stem import WordNetLemmatizer
 import pickle
 
 # Read 1 file in train data
@@ -17,7 +19,8 @@ def read_train_data(word, pos):
     tree = ET.parse(path)
     root = tree.getroot()
     documents = list(elem.text for elem in list(root))
-    return documents
+    # use a subset of training file for debugging. Will change back to full documents later.
+    return documents[:1000]
 
 
 # Get number of meanings of a word (helper)
@@ -50,9 +53,9 @@ def transform(vectorizer, documents):
 
 # Fit KMeans model, return both km model and number of clusters
 def model_fit(word, pos, vectors):
-    km = AgglomerativeClustering(n_clusters = get_num_meanings(word, pos))
-    km.fit(vectors.toarray())
-    return km, get_num_meanings(word, pos)
+    hr = AgglomerativeClustering(n_clusters = get_num_meanings(word, pos), affinity = 'cosine', linkage = 'complete')
+    hr.fit(vectors.toarray())
+    return hr, get_num_meanings(word, pos)
 
 # Get labels
 def predict_labels(km):

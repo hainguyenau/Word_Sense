@@ -67,12 +67,16 @@ class Meaning:
 
     def predict(self, sentence):
         # return meaning
-        if self.word in sentence:
-            v = self.vectorizer.transform([sentence])
-            label =  self.model.predict(v)[0]
-            return labels_to_defs(self.model, self.word, self.pos)[label]
-        else:
-            return 'The word '+ self.word + ' is not in the sentence!!!!'
+        v = self.vectorizer.transform([sentence])
+
+        # .predict method only for kmeans
+        # label =  self.model.predict(v)[0]
+
+        # don't call fit_model anymore
+        hr = AgglomerativeClustering(n_clusters = get_num_meanings(self.word, self.pos), affinity = 'cosine', linkage = 'complete')
+        label =  hr.fit_predict(v.toarray())[0]
+        return labels_to_defs(self.model, self.word, self.pos)[label]
+
 
     #Predict with nltk
     def nltk_predict(self, sentence):
@@ -84,8 +88,9 @@ class Meaning:
 if __name__ == '__main__':
     obj = Meaning('access', 'n')
     obj.train()
+    sent = '$ 10 milion redesign on all guestrooms in 2002. King/Doubles , coffee maker , in-room safe suitable for laptops , workingdesk with data port , newspaper , high speed , wireless internet access .'
     # test_documents = obj.load_test()
-    print np.bincount(obj.model.labels_)
+    print obj.predict(sent)
 
 
     # Assess score of ouro predictions compared to nltk
@@ -96,8 +101,8 @@ if __name__ == '__main__':
     #
     #     if our_predictions == nltk_prediction:
     #         score += 1
-    #     # print our_predictions
-    #     # print nltk_prediction
+    #     print 'ours: ', our_predictions
+    #     print 'nltk: ', nltk_prediction
     # print score, len(test_documents)
 
 
