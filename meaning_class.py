@@ -29,6 +29,11 @@ class Meaning:
 
         # scale the feature vectors
         scaler = MaxAbsScaler(copy=False)
+
+'''
+Problem below:
+see jupyter notebook
+'''
         vectors = scaler.fit_transform(vectors)
         self.model, self.num_clusters = model_fit(self.word, self.pos, vectors)
 
@@ -75,6 +80,7 @@ class Meaning:
         # don't call fit_model anymore
         hr = AgglomerativeClustering(n_clusters = get_num_meanings(self.word, self.pos), affinity = 'cosine', linkage = 'complete')
         label =  hr.fit_predict(v.toarray())[0]
+
         return labels_to_defs(self.model, self.word, self.pos)[label]
 
 
@@ -88,9 +94,10 @@ class Meaning:
 if __name__ == '__main__':
     obj = Meaning('access', 'n')
     obj.train()
-    sent = '$ 10 milion redesign on all guestrooms in 2002. King/Doubles , coffee maker , in-room safe suitable for laptops , workingdesk with data port , newspaper , high speed , wireless internet access .'
-    # test_documents = obj.load_test()
-    print obj.predict(sent)
+    # sent = '$ 10 milion redesign on all guestrooms in 2002. King/Doubles , coffee maker , in-room safe suitable for laptops , workingdesk with data port , newspaper , high speed , wireless internet access .'
+    # # test_documents = obj.load_test()
+    # print obj.predict(sent)
+
 
 
     # Assess score of ouro predictions compared to nltk
