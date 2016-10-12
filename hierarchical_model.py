@@ -20,7 +20,7 @@ def read_train_data(word, pos):
     root = tree.getroot()
     documents = list(elem.text for elem in list(root))
     # use a subset of training file for debugging. Will change back to full documents later.
-    return documents[:1000]
+    return documents
 
 
 # Get number of meanings of a word (helper)
@@ -53,7 +53,7 @@ def transform(vectorizer, documents):
 
 # Fit KMeans model, return both km model and number of clusters
 def model_fit(word, pos, vectors):
-    hr = AgglomerativeClustering(n_clusters = get_num_meanings(word, pos), affinity = 'cosine', linkage = 'complete')
+    hr = AgglomerativeClustering(n_clusters = get_num_meanings(word, pos), affinity = 'jaccard', linkage = 'average')
     hr.fit(vectors.toarray())
     return hr, get_num_meanings(word, pos)
 

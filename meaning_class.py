@@ -29,13 +29,13 @@ class Meaning:
 
         # scale the feature vectors
         scaler = MaxAbsScaler(copy=False)
-
-'''
-Problem below:
-see jupyter notebook
-'''
         vectors = scaler.fit_transform(vectors)
         self.model, self.num_clusters = model_fit(self.word, self.pos, vectors)
+
+
+        # return train_documents to use in predict function
+        return train_documents
+
 
     # Load test data
     def load_test(self):
@@ -70,16 +70,17 @@ see jupyter notebook
             meaning = pickle.load(f)
         return meaning
 
-    def predict(self, sentence):
+    def predict(self, sentence, train_documents):
         # return meaning
-        v = self.vectorizer.transform([sentence])
+        vectorizer = vectorize([sentence])
+        vector = transform(vectorizer, train_documents)
 
         # .predict method only for kmeans
         # label =  self.model.predict(v)[0]
 
         # don't call fit_model anymore
-        hr = AgglomerativeClustering(n_clusters = get_num_meanings(self.word, self.pos), affinity = 'cosine', linkage = 'complete')
-        label =  hr.fit_predict(v.toarray())[0]
+        hr = AgglomerativeClustering(n_clusters = get_num_meanings(self.word, self.pos), affinity = 'jaccard', linkage = 'average')
+        label =  hr.fit_predict(vector.toarray())[0]
 
         return labels_to_defs(self.model, self.word, self.pos)[label]
 
@@ -92,25 +93,23 @@ see jupyter notebook
 
 
 if __name__ == '__main__':
-    obj = Meaning('access', 'n')
-    obj.train()
-    # sent = '$ 10 milion redesign on all guestrooms in 2002. King/Doubles , coffee maker , in-room safe suitable for laptops , workingdesk with data port , newspaper , high speed , wireless internet access .'
-    # # test_documents = obj.load_test()
-    # print obj.predict(sent)
+    obj = Meaning('promotion', 'n')
+    train_documents = obj.train()
+    test_documents = obj.load_test()
 
 
 
     # Assess score of ouro predictions compared to nltk
-    # score = 0
-    # for sent in test_documents:
-    #     our_predictions = obj.predict(sent)
-    #     nltk_prediction = obj.nltk_predict(sent)
-    #
-    #     if our_predictions == nltk_prediction:
-    #         score += 1
-    #     print 'ours: ', our_predictions
-    #     print 'nltk: ', nltk_prediction
-    # print score, len(test_documents)
+    score = 0
+    for sent in test_documents:
+        our_predictions = obj.predict(sent, train_documents)
+        nltk_prediction = obj.nltk_predict(sent)
+
+        if our_predictions == nltk_prediction:
+            score += 1
+        print 'ours: ', our_predictions
+        print 'nltk: ', nltk_prediction
+    print score, len(test_documents)
 
 
 
