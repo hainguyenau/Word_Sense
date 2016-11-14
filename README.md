@@ -34,11 +34,12 @@ Since all of the unsupervised methods did not yield good results, I decided to u
 * <b>Multinomial Naive Bayes</b>
 This model is simple, yet has the potential to make good predictions. By adjusing the hyper-parameter <em>alpha</em> for the model, I found that alpha = 0.12 is optimum. The accuracy, precision and recall averages for a few different homographs are shown below
 
+
 |Word | Accuracy| Precision| Recall|
-|-----|:--------:|----:|
+|:-----:|:--------:|:----:|:----:|
 |"HARD"|72%|74%|80%|
 |"INTEREST"|75%|73%|75%|
-|'LINE'|72%|74%|72%|
+|"LINE"|72%|74%|72%|
 
 
 When compared the base algorithm where we always predict the most common meaning of a word (with accuracy between 51.4% and 57%), this model seems to perform better. 
