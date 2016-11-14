@@ -2,6 +2,7 @@
 Homograph words are words with the same spelling, but can have different meanings. The list of homograph words in English can be found in <em>homograps.md</em>. For example, as an old joke says:
 
 > <b>Q</b>: Why do you think movie stars are so cool?
+>
 > <b>A</b>: Because they have lots of fans
 
 The twist in here is that the words <b>"cool"</b> and <b>"fans"</b> have two different meanings. It is fairly simple for human to decide which meaning of a homograph word is used given the context where the word is in. But to train the computer to do the same is not a simple tasks. In Natural Language Processing, this challenge is call "word wense disambiguation". Several algorithms have been developed, some are simple and some are very sophisticated. In this project, I attempted to explore the word sense disambiguation challenge with different type of models.
